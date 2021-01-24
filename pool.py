@@ -39,7 +39,7 @@ class SlavePool:
             slave = self.slaves_available.pop()
             self.slaves_unavailable.append(slave)
             print(slave.tostring())#return the slave string
-            ans.append(slave.name)
+            ans.append(slave.name + ': '+slave.ip)
             slave.working_time(duration)
         return {'slaves': ans}
 
