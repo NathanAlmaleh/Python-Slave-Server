@@ -28,8 +28,9 @@ class SlavePool:
                 elif time >= now:
                     comeback = time-now
                     comeback_st_array = str(comeback).split(':')
-                    print(comeback_st_array[2])
-                    return {'slaves': '[]', 'come back': comeback_st_array[2]}
+                    print("exact time ",comeback_st_array[2])
+                    time_to_wait=str(int(float(comeback_st_array[2]))+1)
+                    return {'slaves': '[]', 'come back': time_to_wait}
             return {'slaves': '[]', 'come back': 'try again'}
 
     def manage_request(self, slaves, duration):
