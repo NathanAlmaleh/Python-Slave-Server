@@ -29,22 +29,26 @@ class Server(BaseHTTPRequestHandler):
     def do_HEAD(self):
         self._set_headers()
 
-    # GET sends back a Hello world message
+    # GET sends back response
     def do_GET(self):
         self._set_headers()
         regex_text = "^\/get_slaves[?]amount[=][0-9]+[&]duration[=][0-9]+" #regex expresion
         if re.match(regex_text, self.path):
             self._set_headers()
-            self.wfile.write(json.dumps("correct get request ").encode())
+            self.json_encode("correct get request ")
             print(urllib.parse.parse_qs(self.path[12:]))
             request_obg = urllib.parse.parse_qs(self.path[12:])
             amount = re.sub("[^0-9]", "", str(request_obg['amount']))
             duration = re.sub("[^0-9]", "", str(request_obg['duration']))
-            self.wfile.write(json.dumps("you have requested: "+ amount+" slaves for a period of: "+duration+" seconds").encode())
-            self.wfile.write(json.dumps(self.mypool.request_slaves(int(amount), int(duration))).encode())
+            self.json_encode("you have requested: " + amount+" slaves for a period of: "+duration+" seconds")
+            self.json_encode(self.mypool.request_slaves(int(amount), int(duration)))
         else:
             self._set_headers()
             self.wfile.write(json.dumps("wrong get request try: /get_slaves?amount=SLAVE_#&duration=WORKING_TIME").encode())
+
+    def json_encode(self,message):
+        self.wfile.write(json.dumps(message).encode())
+
 
     # POST echoes the message adding a JSON field
     def do_POST(self):
