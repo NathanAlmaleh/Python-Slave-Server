@@ -12,6 +12,80 @@ Send a POST request:
     curl -d "foo=bar&bin=baz" http://localhost:8000
 """
 from pool import SlavePool
+from http.server import HTTPServer, BaseHTTPRequestHandler
+import json
+import cgi
+import re
+import urllib.parse
+
+
+class Server(BaseHTTPRequestHandler):
+    mypool = SlavePool(10)
+    def _set_headers(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+
+    def do_HEAD(self):
+        self._set_headers()
+
+    # GET sends back a Hello world message
+    def do_GET(self):
+        self._set_headers()
+        regex_text = "^\/get_slaves[?]amount[=][0-9]+[&]duration[=][0-9]+" #regex expresion
+        if re.match(regex_text, self.path):
+            self._set_headers()
+            self.wfile.write(json.dumps("correct get request ").encode())
+            print(urllib.parse.parse_qs(self.path[12:]))
+            request_obg = urllib.parse.parse_qs(self.path[12:])
+            amount = re.sub("[^0-9]", "", str(request_obg['amount']))
+            duration = re.sub("[^0-9]", "", str(request_obg['duration']))
+            self.wfile.write(json.dumps("you have requested: "+ amount+" slaves for a period of: "+duration+" seconds").encode())
+            self.wfile.write(json.dumps(self.mypool.request_slaves(int(amount), int(duration))).encode())
+        else:
+            self._set_headers()
+            self.wfile.write(json.dumps("wrong get request try: /get_slaves?amount=SLAVE_#&duration=WORKING_TIME").encode())
+
+    # POST echoes the message adding a JSON field
+    def do_POST(self):
+        ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+
+        # refuse to receive non-json content
+        if ctype != 'application/json':
+            self.send_response(400)
+            self.end_headers()
+            return
+
+        # read the message and convert it into a python dictionary
+        length = int(self.headers.getheader('content-length'))
+        message = json.loads(self.rfile.read(length))
+
+        # add a property to the object, just to mess with data
+        message['received'] = 'ok'
+
+        # send the message back
+        self._set_headers()
+        self.wfile.write(json.dumps(message))
+
+
+def run(server_class=HTTPServer, handler_class=Server, port=8008):
+    server_address = ('', port)
+    httpd = server_class(server_address, handler_class)
+
+    print('Starting httpd on port %d...' % port)
+    httpd.serve_forever()
+
+
+if __name__ == "__main__":
+    from sys import argv
+
+    if len(argv) == 2:
+        run(port=int(argv[1]))
+    else:
+        run()
+'''
+#server with HtML Page
+from pool import SlavePool
 import json
 import re
 import urllib.parse
@@ -84,8 +158,9 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     run(addr=args.listen, port=args.port)
-
-    '''
+'''
+'''
+    my test 
     if __name__ == '__main__':
         duration = 2
 
@@ -106,4 +181,4 @@ if __name__ == "__main__":
         my_pool.request_slaves(6, duration + 2)
         my_pool.request_slaves(4, duration - 1)
         my_pool.request_slaves(1, duration + 4)
-          '''
+'''
