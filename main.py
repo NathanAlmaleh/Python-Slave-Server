@@ -55,7 +55,8 @@ class S(BaseHTTPRequestHandler):
     def do_POST(self):
         # Doesn't do anything with posted data
         self._set_headers()
-        self.wfile.write(self._html("POST!"))
+        #self.wfile.write(self._html("POST!"))
+        self.wfile.write(json.dumps("POST!").encode())
 
 
 def run(server_class=HTTPServer, handler_class=S, addr="localhost", port=8000):
