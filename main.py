@@ -19,7 +19,7 @@ class Server(BaseHTTPRequestHandler):
 
     # GET sends back response
     def do_GET(self):
-        self._set_headers()
+        #self._set_headers()
         regex_text = "^\/get_slaves[?]amount[=][0-9]+[&]duration[=][0-9]+" #regex expresion
         if re.match(regex_text, self.path):
             self._set_headers()
