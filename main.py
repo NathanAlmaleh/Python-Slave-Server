@@ -1,16 +1,4 @@
 
-"""
-Very simple HTTP server in python (Updated for Python 3.7)
-Usage:
-    ./dummy-web-server.py -h
-    ./dummy-web-server.py -l localhost -p 8000
-Send a GET request:
-    curl http://localhost:8000
-Send a HEAD request:
-    curl -I http://localhost:8000
-Send a POST request:
-    curl -d "foo=bar&bin=baz" http://localhost:8000
-"""
 from pool import SlavePool
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
@@ -35,12 +23,12 @@ class Server(BaseHTTPRequestHandler):
         regex_text = "^\/get_slaves[?]amount[=][0-9]+[&]duration[=][0-9]+" #regex expresion
         if re.match(regex_text, self.path):
             self._set_headers()
-            self.json_encode("correct get request ")
+            print("correct get request ")
             print(urllib.parse.parse_qs(self.path[12:]))
             request_obg = urllib.parse.parse_qs(self.path[12:])
             amount = re.sub("[^0-9]", "", str(request_obg['amount']))
             duration = re.sub("[^0-9]", "", str(request_obg['duration']))
-            self.json_encode("you have requested: " + amount+" slaves for a period of: "+duration+" seconds")
+            print("you have requested: " + amount+" slaves for a period of: "+duration+" seconds")
             self.json_encode(self.mypool.request_slaves(int(amount), int(duration)))
         else:
             self._set_headers()
@@ -72,7 +60,7 @@ class Server(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(message))
 
 
-def run(server_class=HTTPServer, handler_class=Server, port=8008):
+def run(server_class=HTTPServer, handler_class=Server, port=8080):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
 
@@ -87,6 +75,23 @@ if __name__ == "__main__":
         run(port=int(argv[1]))
     else:
         run()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 '''
 #server with HtML Page
 from pool import SlavePool

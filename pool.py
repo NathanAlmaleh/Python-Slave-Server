@@ -9,7 +9,7 @@ class SlavePool:
         self.slaves_unavailable = []
         self.request_log = []
         for x in range(slaves):
-            self.slaves_available.append(Slave("ip" + str(x + 1), "192.168.0.10" + str(x + 1)))
+            self.slaves_available.append(Slave("ip" + str(x + 1), "192.168.0." + str(101 + x)))
 
     def request_slaves(self, slaves, duration):
         now = datetime.datetime.now()
@@ -39,7 +39,7 @@ class SlavePool:
             slave = self.slaves_available.pop()
             self.slaves_unavailable.append(slave)
             print(slave.tostring())#return the slave string
-            ans.append(slave.name + ': '+slave.ip)
+            ans.append(slave.ip)
             slave.working_time(duration)
         return {'slaves': ans}
 
